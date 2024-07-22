@@ -1,0 +1,7 @@
+name: Combidlog
+version: '${version}'
+main: de.chilliger.Combidlog
+api-version: '1.21'
+
+author: "Chilliger"
+softdepend: [Citizens]
