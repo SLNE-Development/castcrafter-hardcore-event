@@ -82,7 +82,6 @@ public class LeaveProtection {
 
         Player entity = (Player) npc.getEntity();
 
-
         List<ItemStack> contentList = new ArrayList<>();
         contentList.addAll(Arrays.asList(npc.getOrAddTrait(Inventory.class).getContents()));
         contentList.addAll(Arrays.asList(npc.getOrAddTrait(Equipment.class).getEquipment()));
@@ -97,19 +96,6 @@ public class LeaveProtection {
 
     }
 
-    public LeaveProtection(boolean ofPlayer, Location location, ItemStack[] content, int playerExp, int playerFireTicks, float playerFallDistance, double playerHealth, String playerName, UUID playerId, int npcId) {
-        this.ofPlayer = ofPlayer;
-        this.location = location;
-        this.content = content;
-        this.playerExp = playerExp;
-        this.playerFireTicks = playerFireTicks;
-        this.playerFallDistance = playerFallDistance;
-        this.playerHealth = playerHealth;
-        this.playerName = playerName;
-        this.playerId = playerId;
-        this.npc = CitizensAPI.getNPCRegistry().getById(npcId);
-    }
-
     public NPC loadNPC() {
         // Call the loadNPC method with the default value of spawn = true
         return loadNPC(true);
@@ -118,15 +104,13 @@ public class LeaveProtection {
     public NPC loadNPC(boolean spawn) {
         // Get the existing NPC instance
         NPC npc = this.npc;
-        if (npc != null) {
-            // If the NPC instance already exists, return it
-            return npc;
-        }
 
-        if (spawn) {
-            // If the spawn flag is true, spawn a new NPC and return it
-            return spawnNPC();
-        }
+        // If the NPC instance already exists, return it
+        if (npc != null) return npc;
+
+        // If the spawn flag is true, spawn a new NPC and return it
+        if (spawn) return spawnNPC();
+
         // If the spawn flag is false, return null
         return null;
     }
@@ -140,8 +124,10 @@ public class LeaveProtection {
         }
 
         // Create a new NPC with the EntityType.PLAYER and the player's name
-        this.npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, playerName);
-
+        if (npc == null){
+            this.npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, playerName);
+        }
+        
         // Equip the NPC with the player's inventory and equipment
         equipNPC(npc);
 
