@@ -80,18 +80,8 @@ public class LeaveProtectionConfig {
         config.set("leaveProtection", null);
         for (LeaveProtection player : leaveProtections) {
             String basePath = "players." + player.getPlayerId();
-            config.set(basePath + ".health", player.getPlayerHealth());
-            config.set(basePath + ".fallDistance", player.getPlayerFallDistance());
-            config.set(basePath + ".fireTicks", player.getPlayerFireTicks());
-            config.set(basePath + ".exp", player.getPlayerExp());
-            config.set(basePath + ".location", player.getLocation());
             config.set(basePath + ".npc", player.getNpc().getId());
-            config.set(basePath + ".name", player.getPlayerName());
             config.set(basePath + ".ofplayer", player.isOfPlayer());
-
-            // Serialize inventory to a string
-            String encodedInventory = encodeInventory(player.getContent());
-            config.set(basePath + ".inventory", encodedInventory);
         }
         config.save();
     }
@@ -102,50 +92,12 @@ public class LeaveProtectionConfig {
 
         for (String key : config.getConfigurationSection("players").getKeys(false)) {
             UUID uuid = UUID.fromString(key);
-            double health = config.getDouble("players." + key + ".health");
-            float fallDistance = (float) config.getDouble("players." + key + ".fallDistance");
-            int fireTicks = config.getInt("players." + key + ".fireTicks");
-            int exp = config.getInt("players." + key + ".exp");
-            Location location = config.getLocation("players." + key + ".location");
-
-            // Deserialize inventory from a string
-            String encodedInventory = config.getString("players." + key + ".inventory");
-            ItemStack[] content = decodeInventory(encodedInventory);
-
             int npcId = config.getInt("players." + key + ".npc");
 
-
-            String playerName = config.getString("players." + key + ".name");
             boolean isOfPlayer = config.getBoolean("players." + key + ".ofplayer");
 
-            LeaveProtection leaveProtection = new LeaveProtection(isOfPlayer,location,content, exp, fireTicks, fallDistance, health, playerName, uuid, npcId);
+            LeaveProtection leaveProtection = new LeaveProtection(npcId, uuid, isOfPlayer);
             leaveProtections.add(leaveProtection);
-        }
-    }
-    public static String encodeInventory(ItemStack[] items) {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream)) {
-            dataOutput.writeInt(items.length);
-            for (ItemStack item : items) {
-                dataOutput.writeObject(item);
-            }
-            return Base64.getEncoder().encodeToString(outputStream.toByteArray());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static ItemStack[] decodeInventory(String base64) {
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64.getDecoder().decode(base64));
-             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream)) {
-            int length = dataInput.readInt();
-            ItemStack[] items = new ItemStack[length];
-            for (int i = 0; i < length; i++) {
-                items[i] = (ItemStack) dataInput.readObject();
-            }
-            return items;
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
         }
     }
 }

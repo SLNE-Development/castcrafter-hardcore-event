@@ -71,6 +71,32 @@ public class LeaveProtection {
         spawnNPC(npc);
     }
 
+    public LeaveProtection(int npcID, UUID playerId, boolean ofPlayer) {
+        this.npc = CitizensAPI.getNPCRegistry().getById(npcID);
+        System.out.println(this.npc.getName());
+        this.ofPlayer = ofPlayer;
+        this.playerId = playerId;
+
+        this.location = npc.getStoredLocation();
+        if (npc.getEntity() == null) throw new IllegalStateException("NPC is not spawned");
+
+        Player entity = (Player) npc.getEntity();
+
+
+        List<ItemStack> contentList = new ArrayList<>();
+        contentList.addAll(Arrays.asList(npc.getOrAddTrait(Inventory.class).getContents()));
+        contentList.addAll(Arrays.asList(npc.getOrAddTrait(Equipment.class).getEquipment()));
+
+        this.content = contentList.toArray(new ItemStack[0]);
+        this.playerExp = entity.getTotalExperience();
+        this.playerFireTicks = entity.getFireTicks();
+        this.playerFallDistance = entity.getFallDistance();
+        this.playerHealth = entity.getHealth();
+        this.playerName = entity.getName();
+        System.out.println("name: " + playerName);
+
+    }
+
     public LeaveProtection(boolean ofPlayer, Location location, ItemStack[] content, int playerExp, int playerFireTicks, float playerFallDistance, double playerHealth, String playerName, UUID playerId, int npcId) {
         this.ofPlayer = ofPlayer;
         this.location = location;
