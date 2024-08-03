@@ -3,6 +3,7 @@ package de.chilliger.utils;
 import org.bukkit.entity.Player;
 
 public enum CombiedLogPermission {
+    COMMAND_PURGE,
     BYPASS;
 
 

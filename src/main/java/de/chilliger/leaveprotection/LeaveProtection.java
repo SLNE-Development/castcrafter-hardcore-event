@@ -1,6 +1,7 @@
 package de.chilliger.leaveprotection;
 
 import de.chilliger.Combidlog;
+import de.chilliger.utils.OFPlayer;
 import lombok.Getter;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
@@ -11,6 +12,7 @@ import net.citizensnpcs.trait.SkinTrait;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
+
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -34,6 +36,9 @@ public class LeaveProtection {
     //location data
     private Location location;
 
+    //if ofPlayer
+    private boolean ofPlayer;
+
     public LeaveProtection(Player player) {
         this.playerId = player.getUniqueId();
         this.playerName = player.getName();
@@ -43,9 +48,40 @@ public class LeaveProtection {
         this.playerExp = player.getTotalExperience();
         this.location = player.getLocation();
         this.content = player.getInventory().getContents();
+        this.ofPlayer = false;
 
         this.npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, playerName);
         spawnNPC(npc);
+    }
+
+    public LeaveProtection(OFPlayer player) {
+        System.out.println(player.getLocation().toString());
+
+        this.playerId = player.getUuid();
+        this.playerName = player.getOfflinePlayer().getName();
+        this.playerHealth = player.getPlayerHealth();
+        this.playerFallDistance = player.getPlayerFallDistance();
+        this.playerFireTicks = player.getPlayerFireTicks();
+        this.playerExp = player.getPlayerExp();
+        this.location = player.getLocation();
+        this.content = player.getContent();
+        this.ofPlayer = true;
+
+        this.npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, playerName);
+        spawnNPC(npc);
+    }
+
+    public LeaveProtection(boolean ofPlayer, Location location, ItemStack[] content, int playerExp, int playerFireTicks, float playerFallDistance, double playerHealth, String playerName, UUID playerId, int npcId) {
+        this.ofPlayer = ofPlayer;
+        this.location = location;
+        this.content = content;
+        this.playerExp = playerExp;
+        this.playerFireTicks = playerFireTicks;
+        this.playerFallDistance = playerFallDistance;
+        this.playerHealth = playerHealth;
+        this.playerName = playerName;
+        this.playerId = playerId;
+        this.npc = CitizensAPI.getNPCRegistry().getById(npcId);
     }
 
     public NPC loadNPC() {
@@ -91,6 +127,7 @@ public class LeaveProtection {
         //null check
         if (location == null || location.getWorld() == null) {
             destroy();
+            System.out.println("null");
             return;
         }
 
@@ -99,6 +136,7 @@ public class LeaveProtection {
 
         //spawn npc
         npc.spawn(location);
+        System.out.println(playerName + " spawned");
 
         //set data
         setData();
@@ -177,6 +215,10 @@ public class LeaveProtection {
         Combidlog.getLeaveProtectionConfig().removeLeaveProtection(this);
     }
 
+    public OFPlayer getOfplayer() {
+        return new OFPlayer(playerId, playerHealth, playerFallDistance, playerFireTicks, playerExp, content, location);
+    }
+
     public void onKill() {
         // Get the stored location
         Location location = this.location;
@@ -216,9 +258,14 @@ public class LeaveProtection {
         System.out.println("Player " + playerName + " was killed at " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ());
 
         // Ban the player with a specific reason and date
-        Bukkit.getPlayer(this.playerId).ban("Du bist gestorben!", new Date(-1), "Du bist gestorben!");
+        Bukkit.getOfflinePlayer(this.playerId).ban("Du bist gestorben!", new Date(90000), "Du bist gestorben!");
 
         // Destroy the LeaveProtection instance
         destroy();
+    }
+
+
+    public boolean isOfPlayer() {
+        return ofPlayer;
     }
 }

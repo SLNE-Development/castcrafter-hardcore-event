@@ -14,13 +14,16 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.PlayerInventory;
+
 import java.util.Arrays;
 import java.util.Date;
 
 public class LeaveProtectionListener implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGH)
+ /*   @EventHandler(priority = EventPriority.HIGH)
     public void onQuit(PlayerQuitEvent event) {
+        if (!Combidlog.getGameManager().isPurge()) return;
+
         // Get player
         Player player = event.getPlayer();
 
@@ -42,6 +45,8 @@ public class LeaveProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event) {
+        if (!Combidlog.getGameManager().isPurge()) return;
+
         // Get the player from the event
         Player player = event.getPlayer();
 
@@ -96,12 +101,7 @@ public class LeaveProtectionListener implements Listener {
         leaveProtection.destroy();
     }
 
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        Player player = event.getEntity();
-        if (CombiedLogPermission.BYPASS.hasPerm(player)) return;
-        player.ban("Du bist gestorben!", new Date(-1), "Du bist gestorben!");
-    }
+  */
 
     @EventHandler(ignoreCancelled = true)
     public void onNPCDeath(NPCDeathEvent event) {
