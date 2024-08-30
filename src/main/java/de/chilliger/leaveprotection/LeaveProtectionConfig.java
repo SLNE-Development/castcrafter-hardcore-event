@@ -78,6 +78,12 @@ public class LeaveProtectionConfig {
             String basePath = "players." + player.getPlayerId();
             config.set(basePath + ".npc", player.getNpc().getId());
             config.set(basePath + ".ofplayer", player.isOfPlayer());
+
+            config.set(basePath + ".playerName", player.getPlayerName());
+            config.set(basePath + ".playerHealth", player.getPlayerHealth());
+            config.set(basePath + ".playerFallDistance", player.getPlayerFallDistance());
+            config.set(basePath + ".playerFireTicks", player.getPlayerFireTicks());
+            config.set(basePath + ".playerExp", player.getPlayerExp());
         }
         config.save();
     }
@@ -89,17 +95,17 @@ public class LeaveProtectionConfig {
         for (String key : config.getConfigurationSection("players").getKeys(false)) {
             UUID uuid = UUID.fromString(key);
             int npcId = config.getInt("players." + key + ".npc");
-            /*
-            String playerName =  config.getString("players." + key + ".playerName");
-            double playerHealth =  config.getDouble("players." + key + ".playerHealth");
-            float playerFallDistance =  config.getInt("players." + key + ".playerFallDistance");
+
+            String playerName = config.getString("players." + key + ".playerName");
+            double playerHealth = config.getDouble("players." + key + ".playerHealth");
+            float playerFallDistance = Float.parseFloat(config.getString("players." + key + ".playerFallDistance"));
             int playerFireTicks = config.getInt("players." + key + ".playerFireTicks");
             int playerExp = config.getInt("players." + key + ".playerExp");
-            */
+
 
             boolean isOfPlayer = config.getBoolean("players." + key + ".ofplayer");
 
-            LeaveProtection leaveProtection = new LeaveProtection(npcId, uuid, isOfPlayer);
+            LeaveProtection leaveProtection = new LeaveProtection(npcId, uuid, isOfPlayer, playerName, playerHealth, playerFallDistance, playerFireTicks, playerExp);
             leaveProtections.add(leaveProtection);
         }
     }

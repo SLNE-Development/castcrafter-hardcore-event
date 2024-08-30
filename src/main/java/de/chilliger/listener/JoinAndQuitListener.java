@@ -3,26 +3,19 @@ package de.chilliger.listener;
 
 import de.chilliger.Combidlog;
 import de.chilliger.leaveprotection.LeaveProtection;
-import de.chilliger.leaveprotection.LeaveProtectionConfig;
 import de.chilliger.utils.CombiedLogPermission;
 import de.chilliger.utils.OFPlayer;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.trait.trait.Equipment;
 import net.citizensnpcs.api.trait.trait.Inventory;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.checkerframework.checker.units.qual.C;
-
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.stream.IntStream;
 
 public class JoinAndQuitListener implements Listener {
@@ -135,8 +128,7 @@ public class JoinAndQuitListener implements Listener {
 
     }
 
-    public void givPlayerStuff(Player player, OFPlayer ofPlayer) {
-
+    public void givPlayerStuff(Player player, OFPlayer ofPlayer){
 
         ItemStack[] content = ofPlayer.getContent();
 

@@ -40,7 +40,6 @@ public class LeaveProtection {
     private Location location;
 
     //if ofPlayer
-    @Getter
     private boolean ofPlayer;
 
     public LeaveProtection(Player player) {
@@ -75,7 +74,9 @@ public class LeaveProtection {
         spawnNPC(npc);
     }
 
-    public LeaveProtection(int npcID, UUID playerId, boolean ofPlayer) {
+
+    public LeaveProtection(int npcID, UUID playerId, boolean ofPlayer, String playerName, double playerHealth, float playerFallDistance, int playerFireTicks, int playerExp) {
+
         this.npc = CitizensAPI.getNPCRegistry().getById(npcID);
         if (npc == null) throw new IllegalStateException("NPC is null");
 
@@ -85,23 +86,21 @@ public class LeaveProtection {
 
         this.location = npc.getStoredLocation();
 
-        Player entity = (Player) npc.getEntity();
-
         List<ItemStack> contentList = new ArrayList<>();
         contentList.addAll(Arrays.asList(npc.getOrAddTrait(Inventory.class).getContents()));
         contentList.addAll(Arrays.asList(npc.getOrAddTrait(Equipment.class).getEquipment()));
 
         this.content = contentList.toArray(new ItemStack[0]);
 
+        this.playerExp = playerExp;
+        this.playerFireTicks = playerFireTicks;
+        this.playerFallDistance = playerFallDistance;
+        this.playerHealth = playerHealth;
+        this.playerName = playerName;
 
-        this.playerExp = entity.getTotalExperience();
-        this.playerFireTicks = entity.getFireTicks();
-        this.playerFallDistance = entity.getFallDistance();
-        this.playerHealth = entity.getHealth();
-        this.playerName = entity.getName();
+        npc.despawn();
 
         spawnNPC();
-        System.out.println("name: " + playerName);
 
     }
 
@@ -282,5 +281,9 @@ public class LeaveProtection {
 
         // Destroy the LeaveProtection instance
         destroy();
+    }
+
+    public boolean isOfPlayer() {
+        return ofPlayer;
     }
 }
