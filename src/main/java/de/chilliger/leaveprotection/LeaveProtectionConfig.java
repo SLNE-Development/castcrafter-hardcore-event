@@ -1,9 +1,11 @@
 package de.chilliger.leaveprotection;
 
+import de.chilliger.Combidlog;
 import de.chilliger.config.FileConfig;
 import de.chilliger.utils.OFPlayer;
 import lombok.Getter;
 import net.citizensnpcs.api.npc.NPC;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -21,11 +23,11 @@ import java.util.UUID;
 public class LeaveProtectionConfig {
 
     private final FileConfig config;
+
     //TODO: save in config
     public LeaveProtectionConfig() {
         this.config = new FileConfig("leaveProtection.yml");
-
-        loadFromConfig();
+        Bukkit.getScheduler().runTaskLater(Combidlog.getInstance(), this::loadFromConfig, 20);
     }
 
     // Static list to store all LeaveProtection instances
@@ -38,10 +40,7 @@ public class LeaveProtectionConfig {
      * @return The LeaveProtection instance, or null if not found
      */
     public LeaveProtection getLeaveProtection(UUID entityId) {
-        return leaveProtections.stream()
-                .filter(lp -> lp.getNpc().getUniqueId().equals(entityId))
-                .findFirst()
-                .orElse(null);
+        return leaveProtections.stream().filter(lp -> lp.getNpc().getUniqueId().equals(entityId)).findFirst().orElse(null);
     }
 
     /**
@@ -51,10 +50,7 @@ public class LeaveProtectionConfig {
      * @return The LeaveProtection instance, or null if not found
      */
     public LeaveProtection getLeaveProtection(Player player) {
-        return leaveProtections.stream()
-                .filter(lp -> lp.getPlayerId().equals(player.getUniqueId()))
-                .findFirst()
-                .orElse(null);
+        return leaveProtections.stream().filter(lp -> lp.getPlayerId().equals(player.getUniqueId())).findFirst().orElse(null);
     }
 
     /**
@@ -93,6 +89,13 @@ public class LeaveProtectionConfig {
         for (String key : config.getConfigurationSection("players").getKeys(false)) {
             UUID uuid = UUID.fromString(key);
             int npcId = config.getInt("players." + key + ".npc");
+            /*
+            String playerName =  config.getString("players." + key + ".playerName");
+            double playerHealth =  config.getDouble("players." + key + ".playerHealth");
+            float playerFallDistance =  config.getInt("players." + key + ".playerFallDistance");
+            int playerFireTicks = config.getInt("players." + key + ".playerFireTicks");
+            int playerExp = config.getInt("players." + key + ".playerExp");
+            */
 
             boolean isOfPlayer = config.getBoolean("players." + key + ".ofplayer");
 

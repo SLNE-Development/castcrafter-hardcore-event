@@ -10,6 +10,7 @@ import de.chilliger.utils.PlaceholderImp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginLogger;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @AllArgsConstructor
@@ -34,6 +35,8 @@ public final class Combidlog extends JavaPlugin {
         instance = this;
         gameManager = new GameManager();
         leaveProtectionConfig = new LeaveProtectionConfig();
+
+        // register commands
         new PurgeCommand();
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) new PlaceholderImp().register();
@@ -44,7 +47,6 @@ public final class Combidlog extends JavaPlugin {
     public void onDisable() {
         gameManager.saveToConfig();
         leaveProtectionConfig.saveToConfig();
-        // Plugin shutdown logic
     }
 
 }

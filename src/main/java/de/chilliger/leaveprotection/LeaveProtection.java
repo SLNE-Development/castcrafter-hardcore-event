@@ -5,6 +5,7 @@ import de.chilliger.utils.OFPlayer;
 import lombok.Getter;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.npc.NPCRegistry;
 import net.citizensnpcs.api.trait.trait.Equipment;
 import net.citizensnpcs.api.trait.trait.Inventory;
 import net.citizensnpcs.api.trait.trait.Owner;
@@ -12,6 +13,8 @@ import net.citizensnpcs.trait.SkinTrait;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -37,6 +40,7 @@ public class LeaveProtection {
     private Location location;
 
     //if ofPlayer
+    @Getter
     private boolean ofPlayer;
 
     public LeaveProtection(Player player) {
@@ -73,12 +77,13 @@ public class LeaveProtection {
 
     public LeaveProtection(int npcID, UUID playerId, boolean ofPlayer) {
         this.npc = CitizensAPI.getNPCRegistry().getById(npcID);
+        if (npc == null) throw new IllegalStateException("NPC is null");
+
         System.out.println(this.npc.getName());
         this.ofPlayer = ofPlayer;
         this.playerId = playerId;
 
         this.location = npc.getStoredLocation();
-        if (npc.getEntity() == null) throw new IllegalStateException("NPC is not spawned");
 
         Player entity = (Player) npc.getEntity();
 
@@ -87,11 +92,15 @@ public class LeaveProtection {
         contentList.addAll(Arrays.asList(npc.getOrAddTrait(Equipment.class).getEquipment()));
 
         this.content = contentList.toArray(new ItemStack[0]);
+
+
         this.playerExp = entity.getTotalExperience();
         this.playerFireTicks = entity.getFireTicks();
         this.playerFallDistance = entity.getFallDistance();
         this.playerHealth = entity.getHealth();
         this.playerName = entity.getName();
+
+        spawnNPC();
         System.out.println("name: " + playerName);
 
     }
@@ -115,7 +124,7 @@ public class LeaveProtection {
         return null;
     }
 
-    private NPC spawnNPC() {
+    private @Nullable NPC spawnNPC() {
         // Check if the location and its world are valid
         if (location == null || location.getWorld() == null) {
             // If not, destroy the LeaveProtection instance and return null
@@ -124,10 +133,9 @@ public class LeaveProtection {
         }
 
         // Create a new NPC with the EntityType.PLAYER and the player's name
-        if (npc == null){
-            this.npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, playerName);
-        }
-        
+        if (npc == null) this.npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, playerName);
+
+
         // Equip the NPC with the player's inventory and equipment
         equipNPC(npc);
 
@@ -174,7 +182,7 @@ public class LeaveProtection {
         }
     }
 
-    public void equipNPC(NPC npc) {
+    public void equipNPC(@NotNull NPC npc) {
         // Set skin
         npc.getOrAddTrait(SkinTrait.class).setSkinName(playerName, true);
 
@@ -274,10 +282,5 @@ public class LeaveProtection {
 
         // Destroy the LeaveProtection instance
         destroy();
-    }
-
-
-    public boolean isOfPlayer() {
-        return ofPlayer;
     }
 }
