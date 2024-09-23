@@ -1,6 +1,7 @@
 package de.chilliger.listener;
 
 import de.chilliger.utils.CombiedLogPermission;
+import de.chilliger.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,6 +14,6 @@ public class PlayerDeathListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
         if (CombiedLogPermission.BYPASS.hasPerm(player)) return;
-        player.ban("Du bist gestorben!", new Date(1000), "Du bist gestorben!");
+        Utils.bannPlayer(player.getUniqueId());
     }
 }

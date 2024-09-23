@@ -1,11 +1,10 @@
 package de.chilliger.leaveprotection;
 
 import de.chilliger.Combidlog;
-import de.chilliger.utils.OFPlayer;
+import de.chilliger.utils.Utils;
 import lombok.Getter;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
-import net.citizensnpcs.api.npc.NPCRegistry;
 import net.citizensnpcs.api.trait.trait.Equipment;
 import net.citizensnpcs.api.trait.trait.Inventory;
 import net.citizensnpcs.api.trait.trait.Owner;
@@ -15,7 +14,6 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -39,8 +37,6 @@ public class LeaveProtection {
     //location data
     private Location location;
 
-    //if ofPlayer
-    private boolean ofPlayer;
 
     public LeaveProtection(Player player) {
         this.playerId = player.getUniqueId();
@@ -51,58 +47,36 @@ public class LeaveProtection {
         this.playerExp = player.getTotalExperience();
         this.location = player.getLocation();
         this.content = player.getInventory().getContents();
-        this.ofPlayer = false;
 
         this.npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, playerName);
+
         spawnNPC(npc);
     }
 
-    public LeaveProtection(OFPlayer player) {
-        System.out.println(player.getLocation().toString());
 
-        this.playerId = player.getUuid();
-        this.playerName = player.getOfflinePlayer().getName();
-        this.playerHealth = player.getPlayerHealth();
-        this.playerFallDistance = player.getPlayerFallDistance();
-        this.playerFireTicks = player.getPlayerFireTicks();
-        this.playerExp = player.getPlayerExp();
+    public LeaveProtection(OfflinePlayer player, boolean spawn, int id) {
+
+        this.playerFallDistance = Utils.getPlayerFallDistance(player);
+        this.playerFireTicks = Utils.getPlayerFireTicks(player);
+        this.playerExp = Utils.getPlayerExp(player);
+        this.playerHealth = Utils.getPlayerHealth(player);
+
+        this.content = Utils.getPlayerInventory(player);
+
         this.location = player.getLocation();
-        this.content = player.getContent();
-        this.ofPlayer = true;
+        this.playerId = player.getUniqueId();
+        this.playerName = player.getName();
 
-        this.npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, playerName);
-        spawnNPC(npc);
-    }
+        if (spawn) {
+            this.npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, playerName);
+            spawnNPC(npc);
+        } else {
+            this.npc = CitizensAPI.getNPCRegistry().getById(id);
+        }
 
-
-    public LeaveProtection(int npcID, UUID playerId, boolean ofPlayer, String playerName, double playerHealth, float playerFallDistance, int playerFireTicks, int playerExp) {
-
-        this.npc = CitizensAPI.getNPCRegistry().getById(npcID);
-        if (npc == null) throw new IllegalStateException("NPC is null");
-
-        System.out.println(this.npc.getName());
-        this.ofPlayer = ofPlayer;
-        this.playerId = playerId;
-
-        this.location = npc.getStoredLocation();
-
-        List<ItemStack> contentList = new ArrayList<>();
-        contentList.addAll(Arrays.asList(npc.getOrAddTrait(Inventory.class).getContents()));
-        contentList.addAll(Arrays.asList(npc.getOrAddTrait(Equipment.class).getEquipment()));
-
-        this.content = contentList.toArray(new ItemStack[0]);
-
-        this.playerExp = playerExp;
-        this.playerFireTicks = playerFireTicks;
-        this.playerFallDistance = playerFallDistance;
-        this.playerHealth = playerHealth;
-        this.playerName = playerName;
-
-        npc.despawn();
-
-        spawnNPC();
 
     }
+
 
     public NPC loadNPC() {
         // Call the loadNPC method with the default value of spawn = true
@@ -162,6 +136,10 @@ public class LeaveProtection {
     }
 
     public void setData() {
+        //set owner
+        npc.getOrAddTrait(Owner.class).setOwner(playerId);
+
+
         // Check if the NPC entity exists
         if (npc.getEntity() == null) return;
 
@@ -234,9 +212,6 @@ public class LeaveProtection {
         Combidlog.getLeaveProtectionConfig().removeLeaveProtection(this);
     }
 
-    public OFPlayer getOfplayer() {
-        return new OFPlayer(playerId, playerHealth, playerFallDistance, playerFireTicks, playerExp, content, location);
-    }
 
     public void onKill() {
         // Get the stored location
@@ -277,13 +252,9 @@ public class LeaveProtection {
         System.out.println("Player " + playerName + " was killed at " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ());
 
         // Ban the player with a specific reason and date
-        Bukkit.getOfflinePlayer(this.playerId).ban("Du bist gestorben!", new Date(90000), "Du bist gestorben!");
+        Utils.bannPlayer(this.playerId);
 
         // Destroy the LeaveProtection instance
         destroy();
-    }
-
-    public boolean isOfPlayer() {
-        return ofPlayer;
     }
 }

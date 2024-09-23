@@ -46,7 +46,6 @@ public final class Combidlog extends JavaPlugin {
     @Override
     public void onDisable() {
         gameManager.saveToConfig();
-        leaveProtectionConfig.saveToConfig();
     }
 
 }

@@ -24,7 +24,7 @@ public class PlaceholderImp extends PlaceholderExpansion {
     @Override
     @NotNull
     public String getIdentifier() {
-        return "combidlog";
+        return plugin.getDescription().getName();
     }
 
     @Override
@@ -42,7 +42,7 @@ public class PlaceholderImp extends PlaceholderExpansion {
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         if (params.equalsIgnoreCase("bandplayers")) {
             return Bukkit.getBannedPlayers().size() + "";
-            //    return Bukkit.getBanList(BanList.Type.NAME).getBanEntries().size() + "";
+            // return Bukkit.getBanList(BanList.Type.PROFILE).getBanEntries().size() + "";
         }
         if (params.equalsIgnoreCase("purge")) {
             return Combidlog.getGameManager().isPurge() + "";
